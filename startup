@@ -1,0 +1,42 @@
+#!/bin/zsh
+
+launchit(){
+  multipass launch -n $C_NAME -c $CORES -m $MEMORY -d $DISK $IMG_NAME
+}
+
+C_NAME=cp
+CORES=1
+MEMORY=2048M
+DISK=5G
+IMG_NAME=focal
+
+launchit
+
+C_NAME=n1
+CORES=1
+MEMORY=1024M
+DISK=3G
+
+launchit
+
+C_NAME=n2
+
+launchit
+
+# C_NAME=n3
+
+# launchit
+
+# C_NAME=n4
+
+# launchit
+
+# C_NAME=n5
+
+# launchit
+
+# C_NAME=n6
+
+# launchit
+
+./setup
