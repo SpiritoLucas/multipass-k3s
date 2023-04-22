@@ -1,6 +1,6 @@
 #!/bin/bash
 
 multipass list
-multipass delete cp n1 n2 n3 
+multipass delete --all
 multipass purge
 multipass list

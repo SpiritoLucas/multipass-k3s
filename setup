@@ -2,29 +2,35 @@
 
 #intall k3s and include vars
 CONTROL_PLANE_NAME=cp
+NODE_NAMES=("n1" "n2" "n3")
+CLUSTER_NAME="'"${CLUSTER_NAME}"'"
 
+#Guardamos el ip del nodo del control planeƒ
 K3S_NODEIP_MASTER=$(multipass info $CONTROL_PLANE_NAME | grep "IPv4" | awk '{print $2}')
 
-multipass exec $CONTROL_PLANE_NAME -- /bin/bash -c "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik --tls-san=cp' K3S_KUBECONFIG_MODE='644' sh -"
+multipass exec $CONTROL_PLANE_NAME -- /bin/bash -c "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik --tls-san=$CONTROL_PLANE_NAME' K3S_KUBECONFIG_MODE='644' sh -"
 
 K3S_TOKEN="$(multipass exec $CONTROL_PLANE_NAME -- /bin/bash -c "sudo cat /var/lib/rancher/k3s/server/node-token")"
 
+intall(){
+    multipass exec $NODE_NAME -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
+}
 
-multipass exec n1 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
-multipass exec n2 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
-# multipass exec n3 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
-# multipass exec n4 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
-# multipass exec n5 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
-# multipass exec n6 -- /bin/bash -c "curl -sfL https://get.k3s.io | K3S_TOKEN=${K3S_TOKEN} K3S_URL=https://${K3S_NODEIP_MASTER}:6443 sh -"
+for i in $NODE_NAMES; do
+    NODE_NAME=$i
+    intall;
+done
 
+#actualizamos el kubeconfig en mi macpro
 multipass exec $CONTROL_PLANE_NAME -- /bin/bash -c "sudo cat /etc/rancher/k3s/k3s.yaml" | > ~/.kube/config 
 
-yq e '.clusters[0].cluster.server = "https://cp:6443"' ~/.kube/config -i
-yq e '.clusters[0].name = "k3s"' ~/.kube/config -i
-yq e '.contexts[0].context.cluster = "k3s"' ~/.kube/config -i
+yq e '.clusters[0].cluster.server = "'"https://${CONTROL_PLANE_NAME}:6443"'"' ~/.kube/config -i
+yq e '.clusters[0].name = "'"${CLUSTER_NAME}"'"' ~/.kube/config -i
+yq e '.contexts[0].context.cluster = "'"${CLUSTER_NAME}"'"' ~/.kube/config -i
 yq e '.contexts[0].context.user = "lucas"' ~/.kube/config -i 
-yq e '.contexts[0].name = "k3s"' ~/.kube/config -i
+yq e '.contexts[0].name = "'"${CLUSTER_NAME}"'"' ~/.kube/config -i
 yq e '.users[0].name = "lucas"' ~/.kube/config -i
-yq e '.current-context = "k3s"' ~/.kube/config -i
+yq e '.current-context = "'"${CLUSTER_NAME}"'"' ~/.kube/config -i
 
+#actualizamos el kubeconfig en mi macair
 scp ~/.kube/config macair:~/.kube/config-k3s

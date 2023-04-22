@@ -6,16 +6,16 @@ launchit(){
 
 C_NAME=cp
 CORES=1
-MEMORY=2048M
-DISK=5G
+MEMORY=3072M
+DISK=20G
 IMG_NAME=focal
 
 launchit
 
 C_NAME=n1
 CORES=1
-MEMORY=1024M
-DISK=3G
+MEMORY=3072M
+DISK=10G
 
 launchit
 
@@ -23,9 +23,9 @@ C_NAME=n2
 
 launchit
 
-# C_NAME=n3
+C_NAME=n3
 
-# launchit
+launchit
 
 # C_NAME=n4
 
