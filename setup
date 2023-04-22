@@ -3,7 +3,7 @@
 #intall k3s and include vars
 CONTROL_PLANE_NAME=cp
 NODE_NAMES=("n1" "n2" "n3")
-CLUSTER_NAME="'"${CLUSTER_NAME}"'"
+CLUSTER_NAME="k3s"
 
 #Guardamos el ip del nodo del control planeƒ
 K3S_NODEIP_MASTER=$(multipass info $CONTROL_PLANE_NAME | grep "IPv4" | awk '{print $2}')
