@@ -34,3 +34,12 @@ yq e '.current-context = "'"${CLUSTER_NAME}"'"' ~/.kube/config -i
 
 #actualizamos el kubeconfig en mi macair
 scp ~/.kube/config macair:~/.kube/config-k3s
+
+#instalacion de metallb
+./metallb/metallb
+
+#instalacion de ingress-controller
+./ingress-controller/ingress-installer
+
+#instalacion de argocd
+./argocd/argocd
